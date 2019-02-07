@@ -10,6 +10,7 @@ import { HomeComponent } from './components/home/home.component';
 import { BooksComponent } from './components/books/books.component';
 import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
 import { AuthGuard } from './guards/auth.guard';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { AuthGuard } from './guards/auth.guard';
     SigninComponent,
     HomeComponent,
     BooksComponent,
-    NavMenuComponent
+    NavMenuComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

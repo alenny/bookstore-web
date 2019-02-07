@@ -1,15 +1,28 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '../models/user';
+import { environment } from '../../environments/environment';
+import { AuthRequest } from '../models/auth.request';
+import { RegisterRequest } from '../models/register.request';
 
 const CURRENT_USER_KEY: string = "currentUser";
+
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor() { }
+  private authUrl: string = environment.authApiEndpoint + '/api/authentication';
+
+  constructor(
+    private http: HttpClient
+  ) { }
 
   getCurrentUser(): User {
     let txt = localStorage.getItem(CURRENT_USER_KEY);
@@ -17,15 +30,34 @@ export class AuthService {
   }
 
   signin(userName: string, password: string): Observable<User> {
-    if (userName !== 'dzy' || password !== 'dzy') {
-      return throwError({ error: 'Bad credential' });
-    }
-    let user = { id: 1, name: 'dzy', jwtToken: 'dzy.dzy.dzy' };
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-    return of(user);
+    let req = new AuthRequest();
+    req.userName = userName;
+    req.password = password;
+    return this.http.post<User>(this.authUrl, req, httpOptions)
+      .pipe(
+        tap(u => {
+          if (u) {
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(u));
+          }
+        })
+      )
   }
 
   signout() {
     localStorage.removeItem(CURRENT_USER_KEY);
+  }
+
+  register(userName: string, password: string): Observable<User> {
+    let req = new RegisterRequest();
+    req.userName = userName;
+    req.password = password;
+    return this.http.post<User>(`${this.authUrl}/register`, req, httpOptions)
+      .pipe(
+        tap(u => {
+          if (u) {
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(u));
+          }
+        })
+      )
   }
 }

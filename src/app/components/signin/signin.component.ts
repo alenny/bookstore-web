@@ -9,8 +9,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class SigninComponent implements OnInit {
 
-  userName: string = '';
-  password: string = '';
+  userName: string;
+  password: string;
 
   constructor(
     private activeRoute: ActivatedRoute,
@@ -24,7 +24,10 @@ export class SigninComponent implements OnInit {
   signin() {
     this.authService.signin(this.userName, this.password)
       .subscribe(
-        _ => this.router.navigate([this.activeRoute.snapshot.queryParamMap.get('returnUrl')]),
+        _ => {
+          let returnUrl = this.activeRoute.snapshot.queryParamMap.get('returnUrl');
+          this.router.navigate([returnUrl ? returnUrl : '']);
+        },
         err => alert('Bad credentials')
       );
   }
